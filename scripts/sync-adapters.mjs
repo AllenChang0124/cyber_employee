@@ -48,6 +48,15 @@ if (!fs.existsSync(statusPath)) {
   });
 }
 
+writeJson(path.join(root, 'state/status.example.json'), {
+  schema_version: 'employee-status.v1',
+  employee_id: agent.employee_id,
+  state: 'idle',
+  active_task_id: null,
+  model_profile: defaultProfile,
+  updated_at: ''
+});
+
 writeJson(path.join(root, '.mcp.json'), {
   mcpServers: asRecord(mcpConfig.mcp_servers)
 });

@@ -29,13 +29,16 @@ files. This repository does not implement the PM scheduler.
    npm run sync
    ```
 
+   This also initializes runtime files such as `state/status.json` when they
+   are missing.
+
 5. Launch Claude Code with a model profile:
 
    ```bash
    npm run claude -- --profile junior-deepseek
    npm run claude -- --profile senior-deepseek
-npm run claude -- --profile junior-minimax-cn
-```
+   npm run claude -- --profile junior-minimax-cn
+   ```
 
 For trusted disposable sandboxes only, you can explicitly bypass Claude Code
 permission prompts:
@@ -56,6 +59,7 @@ interface is JSON-first:
 - `inbox/tasks/*.json` contains assigned tasks.
 - `outbox/results/*.json` contains task results.
 - `state/status.json` exposes current employee state.
+- `state/status.example.json` is the committed status template.
 - `logs/events.jsonl` stores append-only local events.
 
 Markdown files beside JSON files are optional human-readable attachments.

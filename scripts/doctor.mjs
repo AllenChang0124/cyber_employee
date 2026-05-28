@@ -28,6 +28,12 @@ function requirePath(relativePath) {
   else fail(`${relativePath} is missing`);
 }
 
+function readJsonIfExists(relativePath) {
+  const fullPath = path.join(root, relativePath);
+  if (!fs.existsSync(fullPath)) return null;
+  return JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+}
+
 const nodeMajor = Number(process.versions.node.split('.')[0]);
 if (nodeMajor >= 18) ok(`Node ${process.versions.node}`);
 else fail(`Node ${process.versions.node} is too old; use Node 18 or newer`);
@@ -53,7 +59,7 @@ else warn('Claude Code CLI was not found in PATH');
   '.claude/commands/execute-task.md',
   '.claude/skills/base/SKILL.md',
   '.claude/skills/task-execution/SKILL.md',
-  'state/status.json'
+  'state/status.example.json'
 ].forEach(requirePath);
 
 [
@@ -67,13 +73,20 @@ else warn('Claude Code CLI was not found in PATH');
 
 try {
   JSON.parse(fs.readFileSync(path.join(root, 'agent.json'), 'utf8'));
-  JSON.parse(fs.readFileSync(path.join(root, 'state/status.json'), 'utf8'));
+  JSON.parse(fs.readFileSync(path.join(root, 'state/status.example.json'), 'utf8'));
+  readJsonIfExists('state/status.json');
   JSON.parse(fs.readFileSync(path.join(root, '.mcp.json'), 'utf8'));
   readYaml(path.join(root, 'config/employee.yaml'));
   readYaml(path.join(root, 'config/models.yaml'));
   ok('JSON and YAML configuration files parse');
 } catch (error) {
   fail(`configuration parse failed: ${error.message}`);
+}
+
+if (fs.existsSync(path.join(root, 'state/status.json'))) {
+  ok('state/status.json runtime state exists');
+} else {
+  warn('state/status.json runtime state is missing; run npm run sync to initialize it');
 }
 
 const envText = fs.existsSync(path.join(root, '.env'))

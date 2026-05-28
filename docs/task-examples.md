@@ -25,6 +25,7 @@ Expected result files:
 outbox/results/task-0001.json
 outbox/results/task-0001.md
 state/status.json
+state/status.example.json
 logs/events.jsonl
 ```
 

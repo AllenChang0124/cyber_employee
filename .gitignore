@@ -29,3 +29,6 @@ outbox/results/*.json
 outbox/results/*.md
 !outbox/results/*.example.json
 !outbox/results/.gitkeep
+
+state/status.json
+!state/status.example.json

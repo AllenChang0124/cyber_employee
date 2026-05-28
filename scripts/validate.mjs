@@ -90,7 +90,7 @@ if (agent?.paths) {
   requireFields(agent.paths, ['inbox', 'outbox', 'status', 'events'], 'agent.json paths');
 }
 
-validateJsonFile('state/status.json', [
+validateJsonFile('state/status.example.json', [
   'schema_version',
   'employee_id',
   'state',
@@ -98,6 +98,17 @@ validateJsonFile('state/status.json', [
   'model_profile',
   'updated_at'
 ]);
+
+if (fs.existsSync(path.join(root, 'state/status.json'))) {
+  validateJsonFile('state/status.json', [
+    'schema_version',
+    'employee_id',
+    'state',
+    'active_task_id',
+    'model_profile',
+    'updated_at'
+  ]);
+}
 
 const mcp = validateJsonFile('.mcp.json', ['mcpServers']);
 if (mcp && (typeof mcp.mcpServers !== 'object' || mcp.mcpServers === null || Array.isArray(mcp.mcpServers))) {
@@ -180,7 +191,7 @@ try {
 const git = spawnSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' });
 if (git.status === 0) {
   const tracked = new Set(git.stdout.split(/\r?\n/).filter(Boolean));
-  for (const forbidden of ['.env']) {
+  for (const forbidden of ['.env', 'state/status.json']) {
     if (tracked.has(forbidden)) fail(`${forbidden} must not be tracked by git`);
   }
   for (const trackedPath of tracked) {
