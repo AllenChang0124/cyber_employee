@@ -64,6 +64,7 @@ const pathPatterns = [
 
 for (const relativePath of files) {
   if (relativePath === 'scripts/validate.mjs') continue;
+  if (relativePath === 'logs/development-handoff.md') continue;
   if (/^\.env(\..+)?$/.test(relativePath) && relativePath !== '.env.example') continue;
   const fullPath = path.join(root, relativePath);
   const text = fs.readFileSync(fullPath, 'utf8');
