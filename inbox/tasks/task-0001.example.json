@@ -1,0 +1,38 @@
+{
+  "schema_version": "employee-task.v1",
+  "task_id": "task-0001",
+  "created_at": "2026-05-28T00:00:00.000Z",
+  "priority": "normal",
+  "task_type": "documentation",
+  "assignee_level": "junior",
+  "model_hint": "junior-deepseek",
+  "input": {
+    "title": "Validate employee bridge protocol",
+    "body_md": "Inspect the employee template and confirm the JSON bridge files are present and internally consistent. Do not modify source files except writing the required result package.",
+    "attachments": [
+      "agent.json",
+      "state/status.json",
+      "config/employee.yaml",
+      "config/models.yaml",
+      ".claude/commands/execute-task.md"
+    ]
+  },
+  "acceptance": [
+    "Confirm agent.json contains schema_version, employee_id, default_model_profile, capabilities, accepts_task_types, and paths.",
+    "Confirm state/status.json uses schema_version employee-status.v1 and has state idle before starting.",
+    "Confirm .claude/commands/execute-task.md describes reading inbox/tasks/<task_id>.json and writing outbox/results/<task_id>.json.",
+    "Write outbox/results/task-0001.json using schema_version employee-result.v1.",
+    "Include a concise verification list in outbox/results/task-0001.json."
+  ],
+  "constraints": {
+    "allowed_paths": [
+      "agent.json",
+      "state/status.json",
+      "config/**",
+      ".claude/commands/**",
+      "outbox/**",
+      "logs/**"
+    ],
+    "deadline_at": null
+  }
+}

@@ -50,6 +50,11 @@ interface is JSON-first:
 
 Markdown files beside JSON files are optional human-readable attachments.
 
+Task examples:
+
+- `inbox/tasks/task-0001.example.json`
+- `docs/task-examples.md`
+
 ## Explicit Wake Mode
 
 Version 1 does not run a watcher or daemon. After PM writes a task file, wake
