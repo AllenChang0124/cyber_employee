@@ -10,6 +10,7 @@ profiles:
     sonnet_model: deepseek-v4-pro[1m]
     haiku_model: deepseek-v4-flash
     subagent_model: deepseek-v4-flash
+    effort_level: max
 
   junior-deepseek:
     provider: deepseek
@@ -20,6 +21,7 @@ profiles:
     sonnet_model: deepseek-v4-flash
     haiku_model: deepseek-v4-flash
     subagent_model: deepseek-v4-flash
+    effort_level: max
 
   junior-minimax-cn:
     provider: minimax

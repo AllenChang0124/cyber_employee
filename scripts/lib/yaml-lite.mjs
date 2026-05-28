@@ -15,6 +15,7 @@ function stripComment(line) {
 function parseScalar(value) {
   const trimmed = value.trim();
   if (trimmed === '') return '';
+  if (trimmed === '{}') return {};
   if (trimmed === 'null') return null;
   if (trimmed === 'true') return true;
   if (trimmed === 'false') return false;

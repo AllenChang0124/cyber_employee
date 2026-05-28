@@ -22,7 +22,7 @@ function loadDotEnv(filePath) {
 }
 
 function parseArgs(argv) {
-  const parsed = { profile: '', task: '', passthrough: [] };
+  const parsed = { profile: '', task: '', dryRun: false, passthrough: [] };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--profile') {
@@ -35,6 +35,8 @@ function parseArgs(argv) {
       i += 1;
     } else if (arg.startsWith('--task=')) {
       parsed.task = arg.slice('--task='.length);
+    } else if (arg === '--dry-run') {
+      parsed.dryRun = true;
     } else {
       parsed.passthrough.push(arg);
     }
@@ -73,15 +75,32 @@ const env = {
 };
 
 if (profile.base_url) env.ANTHROPIC_BASE_URL = profile.base_url;
+if (profile.effort_level) env.CLAUDE_CODE_EFFORT_LEVEL = profile.effort_level;
 if (args.task) env.EMPLOYEE_TASK_ID = args.task;
 
 console.log(`Launching Claude Code with profile ${profileName}`);
+console.log(`Provider base URL: ${profile.base_url || '(default)'}`);
+console.log(`Claude Code model: ${profile.model}`);
 if (args.task) {
   console.log(`Task ${args.task} is available as EMPLOYEE_TASK_ID.`);
   console.log(`Inside Claude Code, run: /execute-task ${args.task}`);
 }
 
-const child = spawn('claude', args.passthrough, {
+const hasModelFlag = args.passthrough.some((arg) => arg === '--model' || arg.startsWith('--model='));
+const launchArgs = hasModelFlag ? args.passthrough : ['--model', profile.model, ...args.passthrough];
+
+if (args.passthrough.includes('--resume') || args.passthrough.includes('--continue')) {
+  console.warn('warning - resumed Claude Code sessions may keep the model saved in the transcript');
+}
+
+if (args.dryRun) {
+  console.log(`Command: claude ${launchArgs.map((arg) => JSON.stringify(arg)).join(' ')}`);
+  console.log('Dry run only; Claude Code was not launched.');
+  process.exit(0);
+}
+
+const child = spawn('claude', launchArgs,
+{
   cwd: root,
   env,
   stdio: 'inherit',

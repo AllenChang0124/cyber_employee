@@ -15,7 +15,7 @@ function fail(message) {
 
 function walk(dir, files = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+    if (['.git', 'node_modules', '.idea', '.vscode'].includes(entry.name)) continue;
     const fullPath = path.join(dir, entry.name);
     const relativePath = path.relative(root, fullPath).replaceAll(path.sep, '/');
     if (entry.isDirectory()) {
@@ -94,6 +94,11 @@ validateJsonFile('state/status.json', [
   'model_profile',
   'updated_at'
 ]);
+
+const mcp = validateJsonFile('.mcp.json', ['mcpServers']);
+if (mcp && (typeof mcp.mcpServers !== 'object' || mcp.mcpServers === null || Array.isArray(mcp.mcpServers))) {
+  fail('.mcp.json mcpServers must be a JSON object');
+}
 
 for (const dir of ['inbox/tasks', 'outbox/results']) {
   const fullDir = path.join(root, dir);

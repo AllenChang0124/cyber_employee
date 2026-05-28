@@ -9,6 +9,11 @@ const employeeConfig = readYaml(path.join(root, 'config/employee.yaml'));
 const modelConfig = readYaml(path.join(root, 'config/models.yaml'));
 const mcpConfig = readYaml(path.join(root, 'config/mcp.yaml'));
 
+function asRecord(value) {
+  if (value && typeof value === 'object' && !Array.isArray(value)) return value;
+  return {};
+}
+
 const employee = employeeConfig.employee || {};
 const defaultProfile = employee.default_model_profile || modelConfig.default_profile || '';
 
@@ -44,7 +49,7 @@ if (!fs.existsSync(statusPath)) {
 }
 
 writeJson(path.join(root, '.mcp.json'), {
-  mcpServers: mcpConfig.mcp_servers || {}
+  mcpServers: asRecord(mcpConfig.mcp_servers)
 });
 
 writeJson(path.join(root, '.claude/settings.json'), {

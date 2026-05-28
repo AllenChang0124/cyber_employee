@@ -79,7 +79,29 @@ The launcher maps a profile to Claude Code environment variables:
 - `ANTHROPIC_DEFAULT_HAIKU_MODEL`
 - `CLAUDE_CODE_SUBAGENT_MODEL`
 
+It also passes `claude --model <profile.model>` so the project profile wins over
+your user-level default for new sessions. Do not launch with `--resume` or
+`--continue` when validating a profile; resumed sessions may keep the model from
+the saved transcript.
+
 API keys are loaded from `.env` or the parent process environment.
+
+## Troubleshooting
+
+If `/doctor` reports `.mcp.json` parse errors, run:
+
+```bash
+npm run sync
+npm run validate
+```
+
+The expected empty MCP file is:
+
+```json
+{
+  "mcpServers": {}
+}
+```
 
 ## Boundaries
 
