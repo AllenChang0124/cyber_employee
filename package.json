@@ -1,0 +1,15 @@
+{
+  "name": "template-base-employee",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "doctor": "node scripts/doctor.mjs",
+    "validate": "node scripts/validate.mjs",
+    "sync": "node scripts/sync-adapters.mjs",
+    "claude": "node scripts/launch-claude.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

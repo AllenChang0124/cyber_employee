@@ -1,0 +1,52 @@
+default_profile: junior-deepseek
+
+profiles:
+  senior-deepseek:
+    provider: deepseek
+    base_url: https://api.deepseek.com/anthropic
+    auth_env: DEEPSEEK_API_KEY
+    model: deepseek-v4-pro[1m]
+    opus_model: deepseek-v4-pro[1m]
+    sonnet_model: deepseek-v4-pro[1m]
+    haiku_model: deepseek-v4-flash
+    subagent_model: deepseek-v4-flash
+
+  junior-deepseek:
+    provider: deepseek
+    base_url: https://api.deepseek.com/anthropic
+    auth_env: DEEPSEEK_API_KEY
+    model: deepseek-v4-flash
+    opus_model: deepseek-v4-pro[1m]
+    sonnet_model: deepseek-v4-flash
+    haiku_model: deepseek-v4-flash
+    subagent_model: deepseek-v4-flash
+
+  junior-minimax-cn:
+    provider: minimax
+    base_url: https://api.minimaxi.com/anthropic
+    auth_env: MINIMAX_API_KEY
+    model: MiniMax-M2.7
+    opus_model: MiniMax-M2.7
+    sonnet_model: MiniMax-M2.7
+    haiku_model: MiniMax-M2.7
+    subagent_model: MiniMax-M2.7
+
+  junior-minimax-global:
+    provider: minimax
+    base_url: https://api.minimax.io/anthropic
+    auth_env: MINIMAX_API_KEY
+    model: MiniMax-M2.7
+    opus_model: MiniMax-M2.7
+    sonnet_model: MiniMax-M2.7
+    haiku_model: MiniMax-M2.7
+    subagent_model: MiniMax-M2.7
+
+  pm-openai:
+    provider: openai
+    base_url: ""
+    auth_env: OPENAI_API_KEY
+    model: gpt-5.5
+    opus_model: gpt-5.5
+    sonnet_model: gpt-5.5
+    haiku_model: gpt-5.5
+    subagent_model: gpt-5.5

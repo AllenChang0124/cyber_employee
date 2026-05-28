@@ -1,0 +1,26 @@
+{
+  "schema_version": "employee-agent.v1",
+  "employee_id": "employee-template",
+  "name": "Template Employee",
+  "level": "junior",
+  "role": "implementation_employee",
+  "default_model_profile": "junior-deepseek",
+  "capabilities": [
+    "execute_json_task_packages",
+    "produce_json_result_packages",
+    "maintain_project_local_memory",
+    "run_project_local_validation"
+  ],
+  "accepts_task_types": [
+    "implementation",
+    "testing",
+    "documentation",
+    "research"
+  ],
+  "paths": {
+    "inbox": "inbox/tasks",
+    "outbox": "outbox/results",
+    "status": "state/status.json",
+    "events": "logs/events.jsonl"
+  }
+}

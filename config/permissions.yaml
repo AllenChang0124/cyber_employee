@@ -1,0 +1,29 @@
+allowed_paths:
+  read:
+    - agent.json
+    - config/**
+    - .claude/**
+    - .mcp.json
+    - inbox/**
+    - memory/**
+    - workspace/**
+    - package.json
+  write:
+    - outbox/**
+    - state/**
+    - logs/**
+    - memory/**
+    - workspace/**
+
+tool_permissions:
+  shell:
+    allowed:
+      - npm run doctor
+      - npm run validate
+      - npm run sync
+  network:
+    default: disabled
+
+forbidden_paths:
+  - user_home_claude_config
+  - user_home_codex_config

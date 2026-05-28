@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run doctor)",
+      "Bash(npm run validate)",
+      "Bash(npm run sync)"
+    ]
+  }
+}

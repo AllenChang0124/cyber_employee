@@ -1,0 +1,28 @@
+employee:
+  id: employee-template
+  name: Template Employee
+  level: junior
+  role: implementation_employee
+  default_model_profile: junior-deepseek
+
+capabilities:
+  - execute_json_task_packages
+  - produce_json_result_packages
+  - maintain_project_local_memory
+  - run_project_local_validation
+
+accepts_task_types:
+  - implementation
+  - testing
+  - documentation
+  - research
+
+responsibilities:
+  owns:
+    - Execute assigned task packages from inbox/tasks
+    - Produce result packages in outbox/results
+    - Keep state/status.json current while working
+  does_not_own:
+    - Product strategy
+    - Multi-employee scheduling
+    - Cross-repository PM coordination

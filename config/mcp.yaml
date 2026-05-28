@@ -1,0 +1,5 @@
+mcp_servers: {}
+
+notes:
+  - Project MCP servers must use project-relative commands or environment variables.
+  - Do not write MCP server configuration to user home directories.
