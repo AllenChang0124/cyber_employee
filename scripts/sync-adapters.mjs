@@ -54,10 +54,38 @@ writeJson(path.join(root, '.mcp.json'), {
 
 writeJson(path.join(root, '.claude/settings.json'), {
   permissions: {
+    defaultMode: 'acceptEdits',
     allow: [
+      'Read',
+      'Write(outbox/**)',
+      'Write(state/**)',
+      'Write(logs/**)',
+      'Write(memory/**)',
+      'Write(workspace/**)',
+      'Edit(outbox/**)',
+      'Edit(state/**)',
+      'Edit(logs/**)',
+      'Edit(memory/**)',
+      'Edit(workspace/**)',
       'Bash(npm run doctor)',
       'Bash(npm run validate)',
-      'Bash(npm run sync)'
+      'Bash(npm run sync)',
+      'Bash(git status:*)',
+      'Bash(git diff:*)',
+      'Bash(rg:*)',
+      'Bash(find:*)',
+      'Bash(ls:*)',
+      'Bash(cat:*)',
+      'Bash(sed:*)',
+      'Bash(tail:*)'
+    ],
+    deny: [
+      'Read(./.env)',
+      'Read(./.env.*)',
+      'Write(./.env)',
+      'Write(./.env.*)',
+      'Edit(./.env)',
+      'Edit(./.env.*)'
     ]
   }
 });

@@ -44,6 +44,10 @@ function validateJsonFile(relativePath, fields) {
   }
 }
 
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
 const files = walk(root);
 const secretPatterns = [
   { name: 'github token', pattern: /ghp_[A-Za-z0-9_]{20,}/ },
@@ -121,7 +125,7 @@ for (const dir of ['inbox/tasks', 'outbox/results']) {
       ]);
       if (task?.input) requireFields(task.input, ['title', 'body_md', 'attachments'], `${relativePath} input`);
     } else {
-      validateJsonFile(relativePath, [
+      const result = validateJsonFile(relativePath, [
         'schema_version',
         'task_id',
         'status',
@@ -134,8 +138,34 @@ for (const dir of ['inbox/tasks', 'outbox/results']) {
         'artifacts',
         'notes'
       ]);
+      if (result) {
+        const markdownPath = relativePath.replace(/\.json$/, '.md');
+        if (!fs.existsSync(path.join(root, markdownPath))) {
+          fail(`${relativePath} is missing companion Markdown report ${markdownPath}`);
+        }
+      }
     }
   }
+}
+
+const eventsPath = path.join(root, 'logs/events.jsonl');
+if (fs.existsSync(eventsPath)) {
+  const lines = fs.readFileSync(eventsPath, 'utf8').split(/\r?\n/).filter(Boolean);
+  lines.forEach((line, index) => {
+    try {
+      const event = JSON.parse(line);
+      requireFields(event, ['schema_version', 'event_id', 'ts', 'task_id', 'type', 'message', 'data'], `logs/events.jsonl line ${index + 1}`);
+      if (event.schema_version !== 'employee-event.v1') fail(`logs/events.jsonl line ${index + 1} has invalid schema_version`);
+      if (!isNonEmptyString(event.event_id)) fail(`logs/events.jsonl line ${index + 1} has empty event_id`);
+      if (!isNonEmptyString(event.ts)) fail(`logs/events.jsonl line ${index + 1} has empty ts`);
+      if (!isNonEmptyString(event.type)) fail(`logs/events.jsonl line ${index + 1} has empty type`);
+      if (typeof event.data !== 'object' || event.data === null || Array.isArray(event.data)) {
+        fail(`logs/events.jsonl line ${index + 1} data must be an object`);
+      }
+    } catch (error) {
+      fail(`logs/events.jsonl line ${index + 1} is not valid JSON: ${error.message}`);
+    }
+  });
 }
 
 try {

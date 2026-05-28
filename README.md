@@ -34,8 +34,18 @@ files. This repository does not implement the PM scheduler.
    ```bash
    npm run claude -- --profile junior-deepseek
    npm run claude -- --profile senior-deepseek
-   npm run claude -- --profile junior-minimax-cn
-   ```
+npm run claude -- --profile junior-minimax-cn
+```
+
+For trusted disposable sandboxes only, you can explicitly bypass Claude Code
+permission prompts:
+
+```bash
+npm run claude -- --profile junior-deepseek --skip-permissions
+```
+
+This passes `--dangerously-skip-permissions`. Do not use it when the employee
+repository has broad filesystem or network access.
 
 ## Employee Bridge
 

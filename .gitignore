@@ -19,3 +19,13 @@ Thumbs.db
 
 logs/*
 !logs/.gitkeep
+
+inbox/tasks/*.json
+inbox/tasks/*.md
+!inbox/tasks/*.example.json
+!inbox/tasks/.gitkeep
+
+outbox/results/*.json
+outbox/results/*.md
+!outbox/results/*.example.json
+!outbox/results/.gitkeep

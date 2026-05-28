@@ -15,9 +15,18 @@ Task id: `$ARGUMENTS`
 6. Execute only within the allowed project-local paths.
 7. Verify each acceptance criterion from the JSON task.
 8. Write `outbox/results/$ARGUMENTS.json`.
-9. Write `outbox/results/$ARGUMENTS.md` when a human-readable report is useful.
+9. Always write `outbox/results/$ARGUMENTS.md` as the human-readable report.
 10. Update `state/status.json` to `idle`.
 11. Append a `completed`, `failed`, or `blocked` event to `logs/events.jsonl`.
+
+Use the real current time for `started_at`, `completed_at`, `updated_at`, and
+event `ts` values. Do not copy placeholder timestamps from examples.
+
+Every event log line must be valid JSON with this shape:
+
+```json
+{"schema_version":"employee-event.v1","event_id":"","ts":"","task_id":"","type":"started","message":"","data":{}}
+```
 
 ## Result JSON
 
@@ -37,4 +46,16 @@ The result file must contain:
   "artifacts": [],
   "notes": []
 }
+```
+
+## Result Markdown
+
+The Markdown report must contain:
+
+```markdown
+# Result
+
+# Verification
+
+# Notes
 ```

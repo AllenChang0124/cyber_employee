@@ -26,10 +26,18 @@ inbox/tasks/<task_id>.md
 5. Perform the task inside allowed paths.
 6. Verify every acceptance criterion.
 7. Write `outbox/results/<task_id>.json`.
-8. Set `state/status.json` back to `idle`.
-9. Append a terminal event to `logs/events.jsonl`.
+8. Write `outbox/results/<task_id>.md`.
+9. Set `state/status.json` back to `idle`.
+10. Append a terminal event to `logs/events.jsonl`.
+
+Use actual current ISO timestamps for result, status, and event files. Do not
+reuse placeholder timestamps from sample tasks.
+
+Every event log line must contain `schema_version`, `event_id`, `ts`, `task_id`,
+`type`, `message`, and `data`.
 
 ## Failure Handling
 
 If the task cannot be completed, write a result JSON with status `blocked` or
-`failed`, explain the reason in `notes`, and include any partial verification.
+`failed`, write the Markdown report, explain the reason in `notes`, and include
+any partial verification.

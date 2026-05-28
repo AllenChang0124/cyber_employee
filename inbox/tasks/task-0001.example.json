@@ -22,6 +22,8 @@
     "Confirm state/status.json uses schema_version employee-status.v1 and has state idle before starting.",
     "Confirm .claude/commands/execute-task.md describes reading inbox/tasks/<task_id>.json and writing outbox/results/<task_id>.json.",
     "Write outbox/results/task-0001.json using schema_version employee-result.v1.",
+    "Write outbox/results/task-0001.md with Result, Verification, and Notes sections.",
+    "Append started and completed events to logs/events.jsonl using schema_version employee-event.v1.",
     "Include a concise verification list in outbox/results/task-0001.json."
   ],
   "constraints": {

@@ -22,7 +22,7 @@ function loadDotEnv(filePath) {
 }
 
 function parseArgs(argv) {
-  const parsed = { profile: '', task: '', dryRun: false, passthrough: [] };
+  const parsed = { profile: '', task: '', dryRun: false, skipPermissions: false, passthrough: [] };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--profile') {
@@ -37,6 +37,8 @@ function parseArgs(argv) {
       parsed.task = arg.slice('--task='.length);
     } else if (arg === '--dry-run') {
       parsed.dryRun = true;
+    } else if (arg === '--skip-permissions') {
+      parsed.skipPermissions = true;
     } else {
       parsed.passthrough.push(arg);
     }
@@ -87,7 +89,11 @@ if (args.task) {
 }
 
 const hasModelFlag = args.passthrough.some((arg) => arg === '--model' || arg.startsWith('--model='));
-const launchArgs = hasModelFlag ? args.passthrough : ['--model', profile.model, ...args.passthrough];
+const launchArgs = hasModelFlag ? [...args.passthrough] : ['--model', profile.model, ...args.passthrough];
+if (args.skipPermissions && !launchArgs.includes('--dangerously-skip-permissions')) {
+  launchArgs.push('--dangerously-skip-permissions');
+  console.warn('warning - permission checks will be bypassed for this Claude Code session');
+}
 
 if (args.passthrough.includes('--resume') || args.passthrough.includes('--continue')) {
   console.warn('warning - resumed Claude Code sessions may keep the model saved in the transcript');
