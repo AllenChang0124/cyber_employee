@@ -271,12 +271,6 @@ launching Claude Code through `npm run claude`. Do not hard-code the key into
 启动 Claude Code 前，`BRAVE_API_KEY` 必须存在于 `.env` 或进程环境变量中。
 不要把 key 硬编码到 `.mcp.json`，也不要提交 `.env`。
 
-For existing employee clones that used `BRAVE_SEARCH_API`, the launcher maps it
-to `BRAVE_API_KEY` for compatibility. New setups should use `BRAVE_API_KEY`.
-
-如果已有员工 clone 使用过 `BRAVE_SEARCH_API`，启动器会兼容映射到
-`BRAVE_API_KEY`。新配置建议统一使用 `BRAVE_API_KEY`。
-
 The template enables only `brave_web_search` by default. This keeps the tool
 surface small and works well for the free Search API. You can expand enabled
 tools later by editing `config/mcp.yaml` and running `npm run sync`.
