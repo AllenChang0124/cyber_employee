@@ -81,10 +81,6 @@ if (!profile) {
 }
 
 const dotEnv = loadDotEnv(path.join(root, '.env'));
-if (!process.env.BRAVE_API_KEY && !dotEnv.BRAVE_API_KEY) {
-  const legacyBraveKey = process.env.BRAVE_SEARCH_API || dotEnv.BRAVE_SEARCH_API;
-  if (legacyBraveKey) dotEnv.BRAVE_API_KEY = legacyBraveKey;
-}
 const authToken = process.env[profile.auth_env] || dotEnv[profile.auth_env];
 if (!authToken) {
   console.error(`missing ${profile.auth_env}; set it in .env or the process environment`);
