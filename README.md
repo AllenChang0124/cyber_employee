@@ -177,6 +177,20 @@ Launch Claude Code for a specific task:
 npm run claude -- --profile junior-deepseek --task task-0001
 ```
 
+Run a trusted employee task non-interactively and exit when finished:
+
+以可信员工模式非交互执行单个任务，完成后自动退出：
+
+```bash
+npm run claude -- --profile junior-deepseek --task task-0001 --auto-run
+```
+
+`--auto-run` uses Claude Code `--print` with `--permission-mode bypassPermissions`.
+Use it only for employee repositories you intentionally deployed and trust.
+
+`--auto-run` 使用 Claude Code `--print` 和 `--permission-mode bypassPermissions`。
+只应在你主动部署并信任的员工 repo 中使用。
+
 Do not use `--resume` or `--continue` when validating profile switching.
 Resumed sessions may keep the model recorded in the old transcript.
 
@@ -210,6 +224,12 @@ repository has broad filesystem or network access.
 
 该选项会传入 `--dangerously-skip-permissions`。当员工 repo 拥有较宽的文件系统
 或网络访问权限时，不建议使用。
+
+In PM auto-dispatch, prefer `--auto-run` over interactive sessions. It avoids
+repeated permission prompts and does not require manually closing Claude Code.
+
+在 PM 自动调度中，优先使用 `--auto-run`，而不是交互式会话。它可以避免反复权限确认，
+也不需要手动关闭 Claude Code。
 
 ## 6. JSON Bridge / JSON 通信桥
 

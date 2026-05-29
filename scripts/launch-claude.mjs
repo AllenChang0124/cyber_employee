@@ -22,7 +22,14 @@ function loadDotEnv(filePath) {
 }
 
 function parseArgs(argv) {
-  const parsed = { profile: '', task: '', dryRun: false, skipPermissions: false, passthrough: [] };
+  const parsed = {
+    profile: '',
+    task: '',
+    dryRun: false,
+    skipPermissions: false,
+    autoRun: false,
+    passthrough: []
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--profile') {
@@ -39,11 +46,27 @@ function parseArgs(argv) {
       parsed.dryRun = true;
     } else if (arg === '--skip-permissions') {
       parsed.skipPermissions = true;
+    } else if (arg === '--auto-run') {
+      parsed.autoRun = true;
     } else {
       parsed.passthrough.push(arg);
     }
   }
   return parsed;
+}
+
+function hasOption(argv, option) {
+  return argv.some((arg) => arg === option || arg.startsWith(`${option}=`));
+}
+
+function buildTaskPrompt(taskId) {
+  return [
+    `请执行项目内任务 ${taskId}。`,
+    `请读取 .claude/commands/execute-task.md，并按照 /execute-task ${taskId} 的协议执行。`,
+    `JSON 任务包是 inbox/tasks/${taskId}.json。`,
+    '完成后必须写 outbox/results 对应 JSON 和 Markdown，更新 state/status.json，并追加 logs/events.jsonl。',
+    '执行完成后直接结束本次非交互会话，不要等待用户继续输入。'
+  ].join(' ');
 }
 
 const args = parseArgs(process.argv.slice(2));
@@ -85,17 +108,39 @@ console.log(`Provider base URL: ${profile.base_url || '(default)'}`);
 console.log(`Claude Code model: ${profile.model}`);
 if (args.task) {
   console.log(`Task ${args.task} is available as EMPLOYEE_TASK_ID.`);
-  console.log(`Inside Claude Code, run: /execute-task ${args.task}`);
+  if (args.autoRun) {
+    console.log('Auto-run mode: Claude Code will execute the task non-interactively and exit.');
+  } else {
+    console.log(`Inside Claude Code, run: /execute-task ${args.task}`);
+  }
 }
 
-const hasModelFlag = args.passthrough.some((arg) => arg === '--model' || arg.startsWith('--model='));
-const launchArgs = hasModelFlag ? [...args.passthrough] : ['--model', profile.model, ...args.passthrough];
-if (args.skipPermissions && !launchArgs.includes('--dangerously-skip-permissions')) {
+const passthrough = [...args.passthrough];
+if (args.autoRun && args.task && passthrough.length === 0) {
+  passthrough.push(buildTaskPrompt(args.task));
+}
+
+const launchArgs = hasOption(passthrough, '--model')
+  ? [...passthrough]
+  : ['--model', profile.model, ...passthrough];
+
+if (args.autoRun) {
+  if (!hasOption(launchArgs, '--print')) launchArgs.unshift('--print');
+  if (!hasOption(launchArgs, '--permission-mode')) {
+    launchArgs.unshift('bypassPermissions');
+    launchArgs.unshift('--permission-mode');
+  }
+  if (!hasOption(launchArgs, '--no-session-persistence')) {
+    launchArgs.unshift('--no-session-persistence');
+  }
+}
+
+if (!args.autoRun && args.skipPermissions && !launchArgs.includes('--dangerously-skip-permissions')) {
   launchArgs.push('--dangerously-skip-permissions');
   console.warn('warning - permission checks will be bypassed for this Claude Code session');
 }
 
-if (args.passthrough.includes('--resume') || args.passthrough.includes('--continue')) {
+if (launchArgs.includes('--resume') || launchArgs.includes('--continue')) {
   console.warn('warning - resumed Claude Code sessions may keep the model saved in the transcript');
 }
 
