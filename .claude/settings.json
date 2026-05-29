@@ -23,7 +23,13 @@
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(sed:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "mcp__firecrawl__firecrawl_search",
+      "mcp__firecrawl__firecrawl_scrape",
+      "mcp__firecrawl__firecrawl_map",
+      "mcp__firecrawl__firecrawl_crawl",
+      "mcp__firecrawl__firecrawl_check_crawl_status",
+      "mcp__firecrawl__firecrawl_extract"
     ],
     "deny": [
       "Read(./.env)",

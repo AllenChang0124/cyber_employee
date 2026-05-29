@@ -1,5 +1,14 @@
-mcp_servers: {}
+mcp_servers:
+  firecrawl:
+    command: npx
+    args:
+      - -y
+      - firecrawl-mcp
+    env:
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY}
 
 notes:
   - Project MCP servers must use project-relative commands or environment variables.
   - Do not write MCP server configuration to user home directories.
+  - Firecrawl provides model-independent web search and page extraction tools.
+  - FIRECRAWL_API_KEY must be supplied from .env or the process environment.

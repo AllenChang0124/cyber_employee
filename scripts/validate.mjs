@@ -52,7 +52,8 @@ const files = walk(root);
 const secretPatterns = [
   { name: 'github token', pattern: /ghp_[A-Za-z0-9_]{20,}/ },
   { name: 'generic api key', pattern: /\bsk-[A-Za-z0-9_-]{16,}/ },
-  { name: 's2 token', pattern: /\bs2k-[A-Za-z0-9_-]{16,}/ }
+  { name: 's2 token', pattern: /\bs2k-[A-Za-z0-9_-]{16,}/ },
+  { name: 'Firecrawl api key', pattern: /\bfc-[A-Za-z0-9_-]{16,}/ }
 ];
 
 const pathPatterns = [
@@ -114,6 +115,19 @@ if (fs.existsSync(path.join(root, 'state/status.json'))) {
 const mcp = validateJsonFile('.mcp.json', ['mcpServers']);
 if (mcp && (typeof mcp.mcpServers !== 'object' || mcp.mcpServers === null || Array.isArray(mcp.mcpServers))) {
   fail('.mcp.json mcpServers must be a JSON object');
+}
+if (mcp?.mcpServers) {
+  const firecrawl = mcp.mcpServers.firecrawl;
+  if (!firecrawl) fail('.mcp.json missing firecrawl MCP server');
+  if (firecrawl) {
+    if (firecrawl.command !== 'npx') fail('.mcp.json firecrawl.command must be npx');
+    if (!Array.isArray(firecrawl.args) || !firecrawl.args.includes('firecrawl-mcp')) {
+      fail('.mcp.json firecrawl.args must include firecrawl-mcp');
+    }
+    if (firecrawl.env?.FIRECRAWL_API_KEY !== '${FIRECRAWL_API_KEY}') {
+      fail('.mcp.json firecrawl env must reference ${FIRECRAWL_API_KEY} instead of a literal key');
+    }
+  }
 }
 
 for (const dir of ['inbox/tasks', 'outbox/results']) {

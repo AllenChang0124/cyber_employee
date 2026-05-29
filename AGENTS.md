@@ -11,5 +11,10 @@ For PM automation, use the JSON bridge:
 - Read result JSON files from `outbox/results/`.
 - Read append-only events from `logs/events.jsonl`.
 
+For current or external web information, the employee template provides a
+project-level Firecrawl MCP server. Do not rely on a specific model's built-in
+web search capability. Web-derived results must include source URLs in the
+result package.
+
 Do not assume this repository contains a multi-employee scheduler. One clone or
 branch equals one employee.

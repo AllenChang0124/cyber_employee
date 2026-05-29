@@ -21,6 +21,10 @@ Read these files first:
 - Keep work inside paths allowed by `config/permissions.yaml`.
 - Do not read or write user home configuration such as Claude or Codex global
   settings.
+- When a task requires current or external web information, use the project
+  Firecrawl MCP tools instead of model-specific built-in search.
+- Record source URLs for any web information in the result JSON `notes` or
+  `artifacts`, and in the Markdown report.
 
 ## Task Execution
 

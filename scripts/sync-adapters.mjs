@@ -9,6 +9,15 @@ const employeeConfig = readYaml(path.join(root, 'config/employee.yaml'));
 const modelConfig = readYaml(path.join(root, 'config/models.yaml'));
 const mcpConfig = readYaml(path.join(root, 'config/mcp.yaml'));
 
+const firecrawlPermissions = [
+  'mcp__firecrawl__firecrawl_search',
+  'mcp__firecrawl__firecrawl_scrape',
+  'mcp__firecrawl__firecrawl_map',
+  'mcp__firecrawl__firecrawl_crawl',
+  'mcp__firecrawl__firecrawl_check_crawl_status',
+  'mcp__firecrawl__firecrawl_extract'
+];
+
 function asRecord(value) {
   if (value && typeof value === 'object' && !Array.isArray(value)) return value;
   return {};
@@ -86,7 +95,8 @@ writeJson(path.join(root, '.claude/settings.json'), {
       'Bash(ls:*)',
       'Bash(cat:*)',
       'Bash(sed:*)',
-      'Bash(tail:*)'
+      'Bash(tail:*)',
+      ...firecrawlPermissions
     ],
     deny: [
       'Read(./.env)',

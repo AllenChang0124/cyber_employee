@@ -57,6 +57,8 @@ Install these on the machine that runs the employee:
 - Claude Code CLI。
 - At least one provider API key, such as DeepSeek or MiniMax.
 - 至少一个模型供应商 API key，例如 DeepSeek 或 MiniMax。
+- Optional Firecrawl API key for model-independent web search.
+- 可选 Firecrawl API key，用于模型无关的网页搜索能力。
 
 Check the local tools:
 
@@ -95,6 +97,7 @@ Fill only the keys you need:
 DEEPSEEK_API_KEY=
 MINIMAX_API_KEY=
 OPENAI_API_KEY=
+FIRECRAWL_API_KEY=
 ```
 
 Do not commit `.env`.
@@ -116,6 +119,13 @@ template is `state/status.example.json`.
 该命令会刷新项目适配文件，并在缺失时创建 `state/status.json`。
 `state/status.json` 是运行时状态文件，不提交。被提交的模板是
 `state/status.example.json`。
+
+The generated `.mcp.json` declares project-local MCP servers. Firecrawl uses
+`FIRECRAWL_API_KEY` from `.env` or the process environment and does not write to
+global Claude or Codex configuration.
+
+生成的 `.mcp.json` 声明项目级 MCP server。Firecrawl 从 `.env` 或进程环境读取
+`FIRECRAWL_API_KEY`，不会写入全局 Claude 或 Codex 配置。
 
 Run health checks:
 
@@ -231,7 +241,43 @@ repeated permission prompts and does not require manually closing Claude Code.
 在 PM 自动调度中，优先使用 `--auto-run`，而不是交互式会话。它可以避免反复权限确认，
 也不需要手动关闭 Claude Code。
 
-## 6. JSON Bridge / JSON 通信桥
+## 6. Web Search Toolbox / 网页搜索工具箱
+
+The template includes a model-independent Firecrawl MCP server for web search
+and page extraction. Use it when a task requires current or external web
+information, regardless of whether the active model is DeepSeek, MiniMax,
+OpenAI, or another Claude Code compatible model.
+
+模板内置模型无关的 Firecrawl MCP server，用于网页搜索和页面提取。当任务需要实时或
+外部网页信息时，应使用它；这不依赖当前模型是 DeepSeek、MiniMax、OpenAI，还是其他
+Claude Code 兼容模型。
+
+Setup:
+
+配置：
+
+```bash
+cp .env.example .env
+# Fill FIRECRAWL_API_KEY in .env
+npm run sync
+npm run doctor
+npm run validate
+```
+
+Claude Code should show a project-level `firecrawl` MCP server in `/mcp`.
+The config location should point at this repository's `.mcp.json`, not at user
+home configuration.
+
+Claude Code 的 `/mcp` 应显示项目级 `firecrawl` MCP server。配置位置应指向本 repo
+内的 `.mcp.json`，而不是用户 home 下的全局配置。
+
+When using web search, record source URLs in the result JSON `notes` or
+`artifacts`, and in the Markdown report.
+
+使用网页搜索时，必须在结果 JSON 的 `notes` 或 `artifacts` 中记录来源 URL，并在
+Markdown 报告中写明来源。
+
+## 7. JSON Bridge / JSON 通信桥
 
 Codex PM should treat this repository as one employee.
 
@@ -259,7 +305,7 @@ authoritative machine protocol.
 
 Markdown companion 是给人阅读的报告或任务说明。JSON 始终是权威机器协议。
 
-## 7. Task Test / 任务测试
+## 8. Task Test / 任务测试
 
 Create a local test task from the committed example:
 
@@ -309,7 +355,7 @@ The runtime files above are ignored by git and should not be committed.
 
 以上运行时文件已被 git 忽略，不应提交。
 
-## 8. Debugging / 调试说明
+## 9. Debugging / 调试说明
 
 ### 8.1 Basic health / 基础健康检查
 
@@ -425,7 +471,7 @@ These are local runtime files. Do not commit them.
 
 这些是本地运行时文件，不要提交。
 
-## 9. Development Conventions / 开发约定
+## 10. Development Conventions / 开发约定
 
 Prefer Chinese for future project documentation, comments, test tasks, and
 handoff notes, so the user can inspect and learn from the project more easily.
@@ -449,7 +495,7 @@ state, task instances, result packages, event logs, or API keys.
 
 只提交属于模板的文件。不要提交本地运行状态、任务实例、结果包、事件日志或 API key。
 
-## 10. Next Step / 下一步
+## 11. Next Step / 下一步
 
 The next major iteration should build the external PM workspace minimum loop:
 
