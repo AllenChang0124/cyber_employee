@@ -13,7 +13,6 @@ Read these files first:
 ## Operating Rules
 
 - Treat JSON files as the authoritative PM communication protocol.
-- Use project MCP tools such as `brave-search` when a task explicitly requires web research or current information.
 - Read assigned tasks from `inbox/tasks/<task_id>.json`.
 - Write results to `outbox/results/<task_id>.json`.
 - Write human-readable reports to `outbox/results/<task_id>.md` when useful.
@@ -22,7 +21,6 @@ Read these files first:
 - Keep work inside paths allowed by `config/permissions.yaml`.
 - Do not read or write user home configuration such as Claude or Codex global
   settings.
-- Do not read `.env`; MCP/API keys are passed through the project launcher environment.
 
 ## Task Execution
 

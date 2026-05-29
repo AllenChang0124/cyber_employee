@@ -92,7 +92,7 @@ if (fs.existsSync(path.join(root, 'state/status.json'))) {
 const envText = fs.existsSync(path.join(root, '.env'))
   ? fs.readFileSync(path.join(root, '.env'), 'utf8')
   : '';
-for (const key of ['DEEPSEEK_API_KEY', 'MINIMAX_API_KEY', 'OPENAI_API_KEY', 'BRAVE_API_KEY']) {
+for (const key of ['DEEPSEEK_API_KEY', 'MINIMAX_API_KEY', 'OPENAI_API_KEY']) {
   if (process.env[key] || new RegExp(`^${key}=.+`, 'm').test(envText)) ok(`${key} is configured`);
   else warn(`${key} is not configured`);
 }
