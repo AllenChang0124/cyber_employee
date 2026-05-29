@@ -11,5 +11,9 @@ For PM automation, use the JSON bridge:
 - Read result JSON files from `outbox/results/`.
 - Read append-only events from `logs/events.jsonl`.
 
+Project-local MCP is generated from `config/mcp.yaml`. Brave Search is included
+as the default web search MCP server and should use `BRAVE_API_KEY` from `.env`
+or the process environment, never a committed literal key.
+
 Do not assume this repository contains a multi-employee scheduler. One clone or
 branch equals one employee.

@@ -115,6 +115,15 @@ const mcp = validateJsonFile('.mcp.json', ['mcpServers']);
 if (mcp && (typeof mcp.mcpServers !== 'object' || mcp.mcpServers === null || Array.isArray(mcp.mcpServers))) {
   fail('.mcp.json mcpServers must be a JSON object');
 }
+if (mcp?.mcpServers?.['brave-search']) {
+  const brave = mcp.mcpServers['brave-search'];
+  requireFields(brave, ['type', 'command', 'args', 'env'], '.mcp.json mcpServers.brave-search');
+  if (brave.type !== 'stdio') fail('.mcp.json brave-search type must be stdio');
+  if (brave.command !== 'npx') fail('.mcp.json brave-search command must be npx');
+  if (!Array.isArray(brave.args)) fail('.mcp.json brave-search args must be an array');
+  if (!brave.args?.includes('@brave/brave-search-mcp-server')) fail('.mcp.json brave-search must use @brave/brave-search-mcp-server');
+  if (brave.env?.BRAVE_API_KEY !== '${BRAVE_API_KEY}') fail('.mcp.json brave-search env.BRAVE_API_KEY must use ${BRAVE_API_KEY}');
+}
 
 for (const dir of ['inbox/tasks', 'outbox/results']) {
   const fullDir = path.join(root, dir);

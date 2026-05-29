@@ -57,6 +57,8 @@ Install these on the machine that runs the employee:
 - Claude Code CLI。
 - At least one provider API key, such as DeepSeek or MiniMax.
 - 至少一个模型供应商 API key，例如 DeepSeek 或 MiniMax。
+- Brave Search API key if web search MCP is enabled.
+- 如果启用 Web 搜索 MCP，需要 Brave Search API key。
 
 Check the local tools:
 
@@ -95,6 +97,7 @@ Fill only the keys you need:
 DEEPSEEK_API_KEY=
 MINIMAX_API_KEY=
 OPENAI_API_KEY=
+BRAVE_API_KEY=
 ```
 
 Do not commit `.env`.
@@ -231,7 +234,51 @@ repeated permission prompts and does not require manually closing Claude Code.
 在 PM 自动调度中，优先使用 `--auto-run`，而不是交互式会话。它可以避免反复权限确认，
 也不需要手动关闭 Claude Code。
 
-## 6. JSON Bridge / JSON 通信桥
+## 6. Project MCP / 项目级 MCP
+
+Brave Search is built into the employee template as the default project-local
+web search MCP server. The source configuration is `config/mcp.yaml`; running
+`npm run sync` generates `.mcp.json`.
+
+Brave Search 已作为默认项目级 Web 搜索 MCP 内置在员工模板中。源配置是
+`config/mcp.yaml`，运行 `npm run sync` 会生成 `.mcp.json`。
+
+The generated project MCP entry uses the official Brave MCP server package:
+
+生成的项目 MCP 入口使用官方 Brave MCP server 包：
+
+```json
+{
+  "mcpServers": {
+    "brave-search": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@brave/brave-search-mcp-server", "--transport", "stdio"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}",
+        "BRAVE_MCP_TRANSPORT": "stdio",
+        "BRAVE_MCP_ENABLED_TOOLS": "brave_web_search"
+      }
+    }
+  }
+}
+```
+
+`BRAVE_API_KEY` must be set in `.env` or the process environment before
+launching Claude Code through `npm run claude`. Do not hard-code the key into
+`.mcp.json` or commit `.env`.
+
+启动 Claude Code 前，`BRAVE_API_KEY` 必须存在于 `.env` 或进程环境变量中。
+不要把 key 硬编码到 `.mcp.json`，也不要提交 `.env`。
+
+The template enables only `brave_web_search` by default. This keeps the tool
+surface small and works well for the free Search API. You can expand enabled
+tools later by editing `config/mcp.yaml` and running `npm run sync`.
+
+模板默认只启用 `brave_web_search`，降低工具噪音，并更适合免费 Search API。
+后续如需扩展工具，修改 `config/mcp.yaml` 后运行 `npm run sync`。
+
+## 7. JSON Bridge / JSON 通信桥
 
 Codex PM should treat this repository as one employee.
 
@@ -259,7 +306,7 @@ authoritative machine protocol.
 
 Markdown companion 是给人阅读的报告或任务说明。JSON 始终是权威机器协议。
 
-## 7. Task Test / 任务测试
+## 8. Task Test / 任务测试
 
 Create a local test task from the committed example:
 
@@ -309,9 +356,9 @@ The runtime files above are ignored by git and should not be committed.
 
 以上运行时文件已被 git 忽略，不应提交。
 
-## 8. Debugging / 调试说明
+## 9. Debugging / 调试说明
 
-### 8.1 Basic health / 基础健康检查
+### 9.1 Basic health / 基础健康检查
 
 Run:
 
@@ -332,7 +379,7 @@ Use this when:
 - API keys may not be configured.
 - API key 可能未配置。
 
-### 8.2 Protocol validation / 协议校验
+### 9.2 Protocol validation / 协议校验
 
 Run:
 
@@ -357,7 +404,7 @@ This checks:
 - `logs/events.jsonl` event shape.
 - `logs/events.jsonl` 事件格式。
 
-### 8.3 MCP config / MCP 配置
+### 9.3 MCP config / MCP 配置
 
 If Claude Code reports a project MCP parse error, run:
 
@@ -368,17 +415,42 @@ npm run sync
 npm run validate
 ```
 
-The expected empty MCP file is:
+The expected project MCP file contains `mcpServers.brave-search` and references
+`${BRAVE_API_KEY}` rather than a literal key.
 
-预期的空 MCP 文件是：
+预期的项目 MCP 文件包含 `mcpServers.brave-search`，并通过 `${BRAVE_API_KEY}`
+引用环境变量，而不是写入明文 key。
 
 ```json
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "brave-search": {
+      "command": "npx"
+    }
+  }
 }
 ```
 
-### 8.4 Model selection / 模型选择
+To debug in `senior-demo`:
+
+在 `senior-demo` 中调试：
+
+```bash
+cd employees/senior-demo
+npm run sync
+npm run doctor
+npm run validate
+npm run claude -- --profile senior-deepseek --dry-run
+```
+
+Then launch Claude Code and run `/doctor` and `/mcp` inside Claude Code. The MCP
+diagnostics should show the project `brave-search` server without writing to
+user home configuration.
+
+之后启动 Claude Code，在 Claude Code 内运行 `/doctor` 和 `/mcp`。MCP 诊断应显示
+项目级 `brave-search` server，且不写入用户 home 配置。
+
+### 9.4 Model selection / 模型选择
 
 If Claude Code starts with the wrong model:
 
@@ -398,7 +470,7 @@ Start a fresh session instead of resuming an old one.
 
 请启动新会话，不要恢复旧会话。
 
-### 8.5 Git hygiene / Git 卫生检查
+### 9.5 Git hygiene / Git 卫生检查
 
 Check local status:
 
@@ -425,7 +497,7 @@ These are local runtime files. Do not commit them.
 
 这些是本地运行时文件，不要提交。
 
-## 9. Development Conventions / 开发约定
+## 10. Development Conventions / 开发约定
 
 Prefer Chinese for future project documentation, comments, test tasks, and
 handoff notes, so the user can inspect and learn from the project more easily.
@@ -449,7 +521,7 @@ state, task instances, result packages, event logs, or API keys.
 
 只提交属于模板的文件。不要提交本地运行状态、任务实例、结果包、事件日志或 API key。
 
-## 10. Next Step / 下一步
+## 11. Next Step / 下一步
 
 The next major iteration should build the external PM workspace minimum loop:
 

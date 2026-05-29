@@ -1,5 +1,15 @@
-mcp_servers: {}
+mcp_servers:
+  brave-search:
+    type: stdio
+    command: npx
+    args: [-y, "@brave/brave-search-mcp-server", "--transport", "stdio"]
+    env:
+      BRAVE_API_KEY: "${BRAVE_API_KEY}"
+      BRAVE_MCP_TRANSPORT: stdio
+      BRAVE_MCP_ENABLED_TOOLS: brave_web_search
 
 notes:
   - Project MCP servers must use project-relative commands or environment variables.
   - Do not write MCP server configuration to user home directories.
+  - Brave Search is enabled by default as a high-frequency web search tool.
+  - BRAVE_API_KEY must be provided by .env or the process environment before launching Claude Code.
