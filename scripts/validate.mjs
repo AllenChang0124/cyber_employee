@@ -48,6 +48,18 @@ function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim() !== '';
 }
 
+const PRIORITIES = ['low', 'normal', 'high'];
+const TASK_TYPES = ['implementation', 'testing', 'documentation', 'research'];
+const ASSIGNEE_LEVELS = ['', 'junior', 'senior'];
+const RESULT_STATUSES = ['completed', 'failed', 'blocked'];
+const EMPLOYEE_STATES = ['idle', 'working'];
+
+function validateEnum(value, allowed, label) {
+  if (!allowed.includes(value)) {
+    fail(`${label} must be one of: ${allowed.map((item) => item || '(empty)').join(', ')}`);
+  }
+}
+
 const files = walk(root);
 const secretPatterns = [
   { name: 'github token', pattern: /ghp_[A-Za-z0-9_]{20,}/ },
@@ -92,7 +104,7 @@ if (agent?.paths) {
   requireFields(agent.paths, ['inbox', 'outbox', 'status', 'events'], 'agent.json paths');
 }
 
-validateJsonFile('state/status.example.json', [
+const exampleStatus = validateJsonFile('state/status.example.json', [
   'schema_version',
   'employee_id',
   'state',
@@ -100,9 +112,10 @@ validateJsonFile('state/status.example.json', [
   'model_profile',
   'updated_at'
 ]);
+if (exampleStatus?.state) validateEnum(exampleStatus.state, EMPLOYEE_STATES, 'state/status.example.json state');
 
 if (fs.existsSync(path.join(root, 'state/status.json'))) {
-  validateJsonFile('state/status.json', [
+  const status = validateJsonFile('state/status.json', [
     'schema_version',
     'employee_id',
     'state',
@@ -110,6 +123,7 @@ if (fs.existsSync(path.join(root, 'state/status.json'))) {
     'model_profile',
     'updated_at'
   ]);
+  if (status?.state) validateEnum(status.state, EMPLOYEE_STATES, 'state/status.json state');
 }
 
 const mcp = validateJsonFile('.mcp.json', ['mcpServers']);
@@ -149,6 +163,11 @@ for (const dir of ['inbox/tasks', 'outbox/results']) {
         'acceptance',
         'constraints'
       ]);
+      if (task) {
+        if (task.priority) validateEnum(task.priority, PRIORITIES, `${relativePath} priority`);
+        if (task.task_type) validateEnum(task.task_type, TASK_TYPES, `${relativePath} task_type`);
+        if (typeof task.assignee_level === 'string') validateEnum(task.assignee_level, ASSIGNEE_LEVELS, `${relativePath} assignee_level`);
+      }
       if (task?.input) requireFields(task.input, ['title', 'body_md', 'attachments'], `${relativePath} input`);
     } else {
       const result = validateJsonFile(relativePath, [
@@ -165,6 +184,7 @@ for (const dir of ['inbox/tasks', 'outbox/results']) {
         'notes'
       ]);
       if (result) {
+        if (result.status) validateEnum(result.status, RESULT_STATUSES, `${relativePath} status`);
         const markdownPath = relativePath.replace(/\.json$/, '.md');
         if (!fs.existsSync(path.join(root, markdownPath))) {
           fail(`${relativePath} is missing companion Markdown report ${markdownPath}`);

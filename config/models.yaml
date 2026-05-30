@@ -42,13 +42,3 @@ profiles:
     sonnet_model: MiniMax-M2.7
     haiku_model: MiniMax-M2.7
     subagent_model: MiniMax-M2.7
-
-  pm-openai:
-    provider: openai
-    base_url: ""
-    auth_env: OPENAI_API_KEY
-    model: gpt-5.5
-    opus_model: gpt-5.5
-    sonnet_model: gpt-5.5
-    haiku_model: gpt-5.5
-    subagent_model: gpt-5.5
