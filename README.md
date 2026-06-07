@@ -127,6 +127,13 @@ global Claude or Codex configuration.
 生成的 `.mcp.json` 声明项目级 MCP server。Firecrawl 从 `.env` 或进程环境读取
 `FIRECRAWL_API_KEY`，不会写入全局 Claude 或 Codex 配置。
 
+`npm run claude` does not load project MCP servers by default. This prevents
+stdio MCP processes from starting before the employee task protocol begins. To
+load the configured project MCP servers for a run, pass `--with-mcp`.
+
+`npm run claude` 默认不加载项目 MCP server，避免 stdio MCP 进程在员工任务协议
+开始前就被启动。某次运行确实需要加载项目 MCP 时，显式传入 `--with-mcp`。
+
 Run health checks:
 
 运行健康检查：
@@ -171,12 +178,28 @@ Claude Code model: ...
 Command: claude "--model" "..."
 ```
 
+By default, the dry-run command should also include an empty strict MCP config:
+
+默认情况下，dry-run 输出的命令也应包含空的 strict MCP 配置：
+
+```text
+--mcp-config "{\"mcpServers\":{}}" "--strict-mcp-config"
+```
+
 Launch Claude Code:
 
 启动 Claude Code：
 
 ```bash
 npm run claude -- --profile junior-deepseek
+```
+
+Load project MCP servers explicitly for this launch:
+
+为本次启动显式加载项目 MCP server：
+
+```bash
+npm run claude -- --profile junior-deepseek --with-mcp
 ```
 
 Launch Claude Code for a specific task:
@@ -268,8 +291,10 @@ Claude Code should show a project-level `firecrawl` MCP server in `/mcp`.
 The config location should point at this repository's `.mcp.json`, not at user
 home configuration.
 
+Start Claude Code with `--with-mcp` when checking or using this toolbox.
 Claude Code 的 `/mcp` 应显示项目级 `firecrawl` MCP server。配置位置应指向本 repo
-内的 `.mcp.json`，而不是用户 home 下的全局配置。
+内的 `.mcp.json`，而不是用户 home 下的全局配置。检查或使用该工具箱时，应使用
+`--with-mcp` 启动 Claude Code。
 
 When using web search, record source URLs in the result JSON `notes` or
 `artifacts`, and in the Markdown report.

@@ -28,6 +28,8 @@ function parseArgs(argv) {
     dryRun: false,
     skipPermissions: false,
     autoRun: false,
+    withMcp: false,
+    noTaskPrompt: false,
     passthrough: []
   };
   for (let i = 0; i < argv.length; i += 1) {
@@ -48,6 +50,10 @@ function parseArgs(argv) {
       parsed.skipPermissions = true;
     } else if (arg === '--auto-run') {
       parsed.autoRun = true;
+    } else if (arg === '--with-mcp') {
+      parsed.withMcp = true;
+    } else if (arg === '--no-task-prompt') {
+      parsed.noTaskPrompt = true;
     } else {
       parsed.passthrough.push(arg);
     }
@@ -116,7 +122,13 @@ if (args.task) {
 }
 
 const passthrough = [...args.passthrough];
-if (args.autoRun && args.task && passthrough.length === 0) {
+const disablesProjectMcp = !args.withMcp && !hasOption(passthrough, '--mcp-config');
+if (disablesProjectMcp) {
+  passthrough.unshift('--strict-mcp-config');
+  passthrough.unshift('{"mcpServers":{}}');
+  passthrough.unshift('--mcp-config');
+}
+if (args.autoRun && args.task && !args.noTaskPrompt) {
   passthrough.push(buildTaskPrompt(args.task));
 }
 
@@ -133,6 +145,14 @@ if (args.autoRun) {
   if (!hasOption(launchArgs, '--no-session-persistence')) {
     launchArgs.unshift('--no-session-persistence');
   }
+}
+
+if (disablesProjectMcp) {
+  console.log('MCP startup: disabled by default; pass --with-mcp to load project MCP servers.');
+} else if (args.withMcp) {
+  console.log('MCP startup: project MCP loading enabled by --with-mcp.');
+} else {
+  console.log('MCP startup: using explicit --mcp-config from command line.');
 }
 
 if (!args.autoRun && args.skipPermissions && !launchArgs.includes('--dangerously-skip-permissions')) {
