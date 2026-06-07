@@ -7,7 +7,8 @@
     "doctor": "node scripts/doctor.mjs",
     "validate": "node scripts/validate.mjs",
     "sync": "node scripts/sync-adapters.mjs",
-    "claude": "node scripts/launch-claude.mjs"
+    "claude": "node scripts/launch-claude.mjs",
+    "event": "node scripts/append-event.mjs"
   },
   "engines": {
     "node": ">=18"

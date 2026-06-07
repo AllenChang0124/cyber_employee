@@ -11,22 +11,32 @@ Task id: `$ARGUMENTS`
 3. If `inbox/tasks/$ARGUMENTS.md` exists, use it only as a human-readable
    supplement. The JSON task file remains authoritative.
 4. Update `state/status.json` to `working` before implementation.
-5. Append a `started` event to `logs/events.jsonl`.
+5. Append a `started` event by running:
+
+   ```bash
+   npm run event -- --type started --task-id "$ARGUMENTS" --message "started task $ARGUMENTS"
+   ```
+
 6. Execute only within the allowed project-local paths.
 7. Verify each acceptance criterion from the JSON task.
 8. Write `outbox/results/$ARGUMENTS.json`.
 9. Always write `outbox/results/$ARGUMENTS.md` as the human-readable report.
 10. Update `state/status.json` to `idle`.
-11. Append a `completed`, `failed`, or `blocked` event to `logs/events.jsonl`.
+11. Append a `completed`, `failed`, or `blocked` event by running `npm run event` again.
 
-Use the real current time for `started_at`, `completed_at`, `updated_at`, and
-event `ts` values. Do not copy placeholder timestamps from examples.
+Use the real current time for `started_at`, `completed_at`, and `updated_at`.
+Do not copy placeholder timestamps from examples. Do not edit `logs/events.jsonl`
+directly; `npm run event` owns JSONL line safety.
 
-Every event log line must be valid JSON with this shape:
+## Event command
 
-```json
-{"schema_version":"employee-event.v1","event_id":"","ts":"","task_id":"","type":"started","message":"","data":{}}
+Use this command shape for event logging:
+
+```bash
+npm run event -- --type completed --task-id "$ARGUMENTS" --message "completed task $ARGUMENTS" --data-json '{"status":"completed"}'
 ```
+
+Optional flags: `--level`, `--run-id`, `--data-json`.
 
 ## Result JSON
 
@@ -42,11 +52,20 @@ The result file must contain:
   "completed_at": "",
   "summary": "",
   "changes": [],
-  "verification": [],
+  "verification": [
+    {
+      "criterion": "copy one acceptance criterion exactly",
+      "passed": true,
+      "detail": "brief evidence"
+    }
+  ],
   "artifacts": [],
   "notes": []
 }
 ```
+
+Each `verification[]` item must be an object with `criterion` copied exactly
+from `acceptance[]` and explicit boolean `passed`.
 
 ## Result Markdown
 

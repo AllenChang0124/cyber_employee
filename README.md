@@ -297,13 +297,17 @@ Machine-readable files:
 - `state/status.json`：当前运行时员工状态。
 - `state/status.example.json`: committed status template.
 - `state/status.example.json`：已提交的状态模板。
-- `logs/events.jsonl`: append-only runtime event log.
-- `logs/events.jsonl`：追加式运行事件日志。
+- `logs/events.jsonl`: append-only runtime event log, written through `npm run event`.
+- `logs/events.jsonl`：追加式运行事件日志，必须通过 `npm run event` 写入。
 
 Markdown companions are human-readable reports or task notes. JSON remains the
 authoritative machine protocol.
 
 Markdown companion 是给人阅读的报告或任务说明。JSON 始终是权威机器协议。
+
+Protocol schemas live in the sibling `cyber_protocol` package. `npm run validate` fails if the shared protocol package is missing; set `CYBER_PROTOCOL_DIR` only when the package is not available as a sibling or ancestor repo.
+
+协议 schema 位于 sibling `cyber_protocol` 包。若共享协议包缺失，`npm run validate` 会失败；只有当协议包不在 sibling 或上级目录时，才需要设置 `CYBER_PROTOCOL_DIR`。
 
 ## 8. Task Test / 任务测试
 
@@ -330,6 +334,14 @@ Inside Claude Code, run:
 
 ```text
 /execute-task task-0001
+```
+
+Append task events through the helper:
+
+通过脚本追加任务事件：
+
+```bash
+npm run event -- --type started --task-id task-0001 --message "started task task-0001"
 ```
 
 Expected runtime outputs:
@@ -396,8 +408,8 @@ This checks:
 - 提交文件中疑似明文密钥。
 - hard-coded local home paths.
 - 硬编码本地 home 路径。
-- required fields in `agent.json`, task JSON, result JSON, and status JSON.
-- `agent.json`、任务 JSON、结果 JSON 和状态 JSON 的必填字段。
+- shared `cyber_protocol` schema for `agent.json`, task JSON, result JSON, and status JSON.
+- 使用共享 `cyber_protocol` schema 校验 `agent.json`、任务 JSON、结果 JSON 和状态 JSON。
 - companion Markdown report for every result JSON.
 - 每个结果 JSON 是否有对应 Markdown 报告。
 - `logs/events.jsonl` event shape.

@@ -64,7 +64,7 @@ function buildTaskPrompt(taskId) {
     `请执行项目内任务 ${taskId}。`,
     `请读取 .claude/commands/execute-task.md，并按照 /execute-task ${taskId} 的协议执行。`,
     `JSON 任务包是 inbox/tasks/${taskId}.json。`,
-    '完成后必须写 outbox/results 对应 JSON 和 Markdown，更新 state/status.json，并追加 logs/events.jsonl。',
+    '完成后必须写 outbox/results 对应 JSON 和 Markdown，更新 state/status.json，并通过 npm run event 追加 logs/events.jsonl。',
     '执行完成后直接结束本次非交互会话，不要等待用户继续输入。'
   ].join(' ');
 }

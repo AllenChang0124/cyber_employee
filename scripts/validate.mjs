@@ -4,7 +4,9 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { readJson } from './lib/project.mjs';
 import { readYaml } from './lib/yaml-lite.mjs';
+import { loadProtocol } from './lib/protocol-loader.mjs';
 
+const protocol = await loadProtocol();
 const root = process.cwd();
 const errors = [];
 
@@ -28,6 +30,10 @@ function walk(dir, files = []) {
 }
 
 function requireFields(object, fields, label) {
+  if (!object || typeof object !== 'object' || Array.isArray(object)) {
+    fail(`${label} must be an object`);
+    return;
+  }
   for (const field of fields) {
     if (!(field in object)) fail(`${label} missing required field: ${field}`);
   }
@@ -44,20 +50,13 @@ function validateJsonFile(relativePath, fields) {
   }
 }
 
-function isNonEmptyString(value) {
-  return typeof value === 'string' && value.trim() !== '';
+function validateProtocol(kind, document, label) {
+  const result = protocol.validateDocument(kind, document, label);
+  for (const issue of result.issues || []) fail(issue.message || String(issue));
 }
 
-const PRIORITIES = ['low', 'normal', 'high'];
-const TASK_TYPES = ['implementation', 'testing', 'documentation', 'research'];
-const ASSIGNEE_LEVELS = ['', 'junior', 'senior'];
-const RESULT_STATUSES = ['completed', 'failed', 'blocked'];
-const EMPLOYEE_STATES = ['idle', 'working'];
-
-function validateEnum(value, allowed, label) {
-  if (!allowed.includes(value)) {
-    fail(`${label} must be one of: ${allowed.map((item) => item || '(empty)').join(', ')}`);
-  }
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
 }
 
 const files = walk(root);
@@ -89,41 +88,15 @@ for (const relativePath of files) {
   }
 }
 
-const agent = validateJsonFile('agent.json', [
-  'schema_version',
-  'employee_id',
-  'name',
-  'level',
-  'role',
-  'default_model_profile',
-  'capabilities',
-  'accepts_task_types',
-  'paths'
-]);
-if (agent?.paths) {
-  requireFields(agent.paths, ['inbox', 'outbox', 'status', 'events'], 'agent.json paths');
-}
+const agent = validateJsonFile('agent.json', []);
+if (agent) validateProtocol('agent', agent, 'agent.json');
 
-const exampleStatus = validateJsonFile('state/status.example.json', [
-  'schema_version',
-  'employee_id',
-  'state',
-  'active_task_id',
-  'model_profile',
-  'updated_at'
-]);
-if (exampleStatus?.state) validateEnum(exampleStatus.state, EMPLOYEE_STATES, 'state/status.example.json state');
+const exampleStatus = validateJsonFile('state/status.example.json', []);
+if (exampleStatus) validateProtocol('status', exampleStatus, 'state/status.example.json');
 
 if (fs.existsSync(path.join(root, 'state/status.json'))) {
-  const status = validateJsonFile('state/status.json', [
-    'schema_version',
-    'employee_id',
-    'state',
-    'active_task_id',
-    'model_profile',
-    'updated_at'
-  ]);
-  if (status?.state) validateEnum(status.state, EMPLOYEE_STATES, 'state/status.json state');
+  const status = validateJsonFile('state/status.json', []);
+  if (status) validateProtocol('status', status, 'state/status.json');
 }
 
 const mcp = validateJsonFile('.mcp.json', ['mcpServers']);
@@ -151,40 +124,12 @@ for (const dir of ['inbox/tasks', 'outbox/results']) {
     if (!entry.endsWith('.json')) continue;
     const relativePath = `${dir}/${entry}`;
     if (dir === 'inbox/tasks') {
-      const task = validateJsonFile(relativePath, [
-        'schema_version',
-        'task_id',
-        'created_at',
-        'priority',
-        'task_type',
-        'assignee_level',
-        'model_hint',
-        'input',
-        'acceptance',
-        'constraints'
-      ]);
-      if (task) {
-        if (task.priority) validateEnum(task.priority, PRIORITIES, `${relativePath} priority`);
-        if (task.task_type) validateEnum(task.task_type, TASK_TYPES, `${relativePath} task_type`);
-        if (typeof task.assignee_level === 'string') validateEnum(task.assignee_level, ASSIGNEE_LEVELS, `${relativePath} assignee_level`);
-      }
-      if (task?.input) requireFields(task.input, ['title', 'body_md', 'attachments'], `${relativePath} input`);
+      const task = validateJsonFile(relativePath, []);
+      if (task) validateProtocol('task', task, relativePath);
     } else {
-      const result = validateJsonFile(relativePath, [
-        'schema_version',
-        'task_id',
-        'status',
-        'model_used',
-        'started_at',
-        'completed_at',
-        'summary',
-        'changes',
-        'verification',
-        'artifacts',
-        'notes'
-      ]);
+      const result = validateJsonFile(relativePath, []);
       if (result) {
-        if (result.status) validateEnum(result.status, RESULT_STATUSES, `${relativePath} status`);
+        validateProtocol('result', result, relativePath);
         const markdownPath = relativePath.replace(/\.json$/, '.md');
         if (!fs.existsSync(path.join(root, markdownPath))) {
           fail(`${relativePath} is missing companion Markdown report ${markdownPath}`);

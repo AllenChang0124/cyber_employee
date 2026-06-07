@@ -2,9 +2,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readYaml } from './lib/yaml-lite.mjs';
+import { loadProtocol } from './lib/protocol-loader.mjs';
 import { ensureDir, nowIso, writeJson } from './lib/project.mjs';
 
 const root = process.cwd();
+const { PROTOCOL_VERSIONS } = await loadProtocol();
 const employeeConfig = readYaml(path.join(root, 'config/employee.yaml'));
 const modelConfig = readYaml(path.join(root, 'config/models.yaml'));
 const mcpConfig = readYaml(path.join(root, 'config/mcp.yaml'));
@@ -27,7 +29,7 @@ const employee = employeeConfig.employee || {};
 const defaultProfile = employee.default_model_profile || modelConfig.default_profile || '';
 
 const agent = {
-  schema_version: 'employee-agent.v1',
+  schema_version: PROTOCOL_VERSIONS.agent,
   employee_id: employee.id || 'employee-template',
   name: employee.name || 'Template Employee',
   level: employee.level || 'junior',
@@ -48,7 +50,7 @@ writeJson(path.join(root, 'agent.json'), agent);
 const statusPath = path.join(root, 'state/status.json');
 if (!fs.existsSync(statusPath)) {
   writeJson(statusPath, {
-    schema_version: 'employee-status.v1',
+    schema_version: PROTOCOL_VERSIONS.status,
     employee_id: agent.employee_id,
     state: 'idle',
     active_task_id: null,
@@ -58,7 +60,7 @@ if (!fs.existsSync(statusPath)) {
 }
 
 writeJson(path.join(root, 'state/status.example.json'), {
-  schema_version: 'employee-status.v1',
+  schema_version: PROTOCOL_VERSIONS.status,
   employee_id: agent.employee_id,
   state: 'idle',
   active_task_id: null,
@@ -88,6 +90,7 @@ writeJson(path.join(root, '.claude/settings.json'), {
       'Bash(npm run doctor)',
       'Bash(npm run validate)',
       'Bash(npm run sync)',
+      'Bash(npm run event:*)',
       'Bash(git status:*)',
       'Bash(git diff:*)',
       'Bash(rg:*)',

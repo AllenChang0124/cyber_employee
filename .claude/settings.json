@@ -16,6 +16,7 @@
       "Bash(npm run doctor)",
       "Bash(npm run validate)",
       "Bash(npm run sync)",
+      "Bash(npm run event:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(rg:*)",
