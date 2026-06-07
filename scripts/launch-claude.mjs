@@ -122,12 +122,6 @@ if (args.task) {
 }
 
 const passthrough = [...args.passthrough];
-const disablesProjectMcp = !args.withMcp && !hasOption(passthrough, '--mcp-config');
-if (disablesProjectMcp) {
-  passthrough.unshift('--strict-mcp-config');
-  passthrough.unshift('{"mcpServers":{}}');
-  passthrough.unshift('--mcp-config');
-}
 if (args.autoRun && args.task && !args.noTaskPrompt) {
   passthrough.push(buildTaskPrompt(args.task));
 }
@@ -147,12 +141,10 @@ if (args.autoRun) {
   }
 }
 
-if (disablesProjectMcp) {
-  console.log('MCP startup: disabled by default; pass --with-mcp to load project MCP servers.');
-} else if (args.withMcp) {
-  console.log('MCP startup: project MCP loading enabled by --with-mcp.');
-} else {
+if (hasOption(passthrough, '--mcp-config')) {
   console.log('MCP startup: using explicit --mcp-config from command line.');
+} else {
+  console.log('MCP startup: project MCP loading enabled by default.');
 }
 
 if (!args.autoRun && args.skipPermissions && !launchArgs.includes('--dangerously-skip-permissions')) {
